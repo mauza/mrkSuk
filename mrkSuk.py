@@ -14,7 +14,8 @@ for row in rows:
     cols = row.find_all('td')
     cols = [ele.text.strip() for ele in cols]
     d = [ele for ele in cols if ele]
-    data[d[0]] = d[1:]
-print(data)
+    if d:
+        data[d[0]] = d[1:]
+print(data['AAPL'])
 
 # you naughty little man
