@@ -14,8 +14,25 @@ for row in rows:
     cols = row.find_all('td')
     cols = [ele.text.strip() for ele in cols]
     d = [ele for ele in cols if ele]
-    if d:
-        data[d[0]] = d[1:]
+    if len(d) == 8:
+        data[d[0]] = {
+            "Company Name": d[1],
+            "CIK": d[7],
+            "Sector": d[3],
+            "Sub Industry": d[4],
+            "Headquarters": d[5],
+            "Start Date": d[6]
+        }
+    elif len(d) == 7:
+        data[d[0]] = {
+            "Company Name": d[1],
+            "CIK": d[6],
+            "Sector": d[3],
+            "Sub Industry": d[4],
+            "Headquarters": d[5]
+        }
 print(data['AAPL'])
 
+cik = data['AAPL']["CIK"]
+print(cik)
 # you naughty little man
