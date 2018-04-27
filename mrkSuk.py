@@ -15,3 +15,5 @@ for row in rows:
     cols = [ele.text.strip() for ele in cols]
     data.append([ele for ele in cols if ele])
 print(data)
+
+#
