@@ -1,7 +1,9 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
+import re
 
 snp500 = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+sec_base = 'https://www.sec.gov/'
 
 page = urllib2.urlopen(snp500)
 soup = BeautifulSoup(page, 'html.parser')
@@ -44,21 +46,23 @@ def secFile(cik):
     cikUrl = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK='+str(cik)+'&type=&dateb=&owner=exclude&start=0&count=100'
     page = urllib2.urlopen(cikUrl)
     soup = BeautifulSoup(page, 'html.parser')
-    table = soup.find('table', attrs={'class':'tableFile2'})
+    buttons = soup.find_all('a', {'id': 'documentsbutton'})
 
-    dicks = []
-    rows = table.find_all('tr')
-    for url in table.find_all('a'):
-        dicks.append(url.attrs['href'])
-    print(len(dicks)) 
-    for row in rows:
-        cols = row.find_all('td') + row.find_all('href')
-        cols = [ele.text.strip() for ele in cols]
-        d = [ele for ele in cols if ele]
+    page_urls = []
+    for a in buttons:
+        page_urls.append(a.attrs['href'])
+    
+    file_urls = []
+    for u in page_urls:
+        url = sec_base + u
+        doc_page = urllib2.urlopen(url)
+        soup2 = BeautifulSoup(doc_page, 'html.parser')
+        file_name = soup2.find(text=re.compile('.*\.htm$'))
+        if file_name:
+            file_urls.append(file_name.parent.attrs['href'])
+    print(len(file_urls))
 
-        if d:
-            dataFile[d[0]] = d[1:]
-    #print(dataFile)
+
 secFile(cik)
 
 #def getThoseNaughtyBits(penis)
