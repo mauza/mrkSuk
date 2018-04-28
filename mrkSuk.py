@@ -46,24 +46,19 @@ def secFile(cik):
     soup = BeautifulSoup(page, 'html.parser')
     table = soup.find('table', attrs={'class':'tableFile2'})
 
+    dicks = []
     rows = table.find_all('tr')
+    for url in table.find_all('a'):
+        dicks.append(url.attrs['href'])
+    print(len(dicks)) 
     for row in rows:
-        cols = row.find_all('td')
+        cols = row.find_all('td') + row.find_all('href')
         cols = [ele.text.strip() for ele in cols]
         d = [ele for ele in cols if ele]
 
         if d:
             dataFile[d[0]] = d[1:]
-
-        if len(d) == 5:
-            data[d[0]] = {
-                "Filings": d[1],
-                "Format": d[2],
-                "Description": d[3],
-                "Filing Date": d[4],
-                "File Number": d[5]
-            }
-    print(dataFile)
+    #print(dataFile)
 secFile(cik)
 
 #def getThoseNaughtyBits(penis)
