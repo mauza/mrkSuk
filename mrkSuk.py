@@ -11,39 +11,41 @@ soup = BeautifulSoup(page, 'html.parser')
 cik = '0001090872'
 data = {}
 dataFile = {}
+datum = []
 
-table = soup.find('table', attrs={'class':'wikitable'})
+def wikipull():
+    table = soup.find('table', attrs={'class':'wikitable'})
 
-rows = table.find_all('tr')
-for row in rows:
-    cols = row.find_all('td')
-    cols = [ele.text.strip() for ele in cols]
-    d = [ele for ele in cols if ele]
-    if d:
-        data[d[0]] = d[1:]
+    rows = table.find_all('tr')
+    for row in rows:
+        cols = row.find_all('td')
+        cols = [ele.text.strip() for ele in cols]
+        d = [ele for ele in cols if ele]
+        if d:
+            data[d[0]] = d[1:]
 
-    if len(d) == 8:
-        data[d[0]] = {
-            "Company Name": d[1],
-            "CIK": d[7],
-            "Sector": d[3],
-            "Sub Industry": d[4],
-            "Headquarters": d[5],
-            "Start Date": d[6]
-        }
-    elif len(d) == 7:
-        data[d[0]] = {
-            "Company Name": d[1],
-            "CIK": d[6],
-            "Sector": d[3],
-            "Sub Industry": d[4],
-            "Headquarters": d[5]
-        }
-#print(data['AAPL'])
+        if len(d) == 8:
+            data[d[0]] = {
+                "Company Name": d[1],
+                "CIK": d[7],
+                "Sector": d[3],
+                "Sub Industry": d[4],
+                "Headquarters": d[5],
+                "Start Date": d[6]
+            }
+        elif len(d) == 7:
+            data[d[0]] = {
+                "Company Name": d[1],
+                "CIK": d[6],
+                "Sector": d[3],
+                "Sub Industry": d[4],
+                "Headquarters": d[5]
+            }
+    #print(data['AAPL'])
 
 
-def secFile(cik):
-    cikUrl = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK='+str(cik)+'&type=&dateb=&owner=exclude&start=0&count=100'
+def secFile(cik, doctype):
+    cikUrl = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK='+str(cik)+'&type='+str(doctype)+'&dateb=&owner=exclude&start=0&count=100'
     page = urllib2.urlopen(cikUrl)
     soup = BeautifulSoup(page, 'html.parser')
     buttons = soup.find_all('a', {'id': 'documentsbutton'})
@@ -51,7 +53,7 @@ def secFile(cik):
     page_urls = []
     for a in buttons:
         page_urls.append(a.attrs['href'])
-    
+    #print(page_urls)
     file_urls = []
     for u in page_urls:
         url = sec_base + u
@@ -60,10 +62,21 @@ def secFile(cik):
         file_name = soup2.find(text=re.compile('.*\.htm$'))
         if file_name:
             file_urls.append(file_name.parent.attrs['href'])
-    print(len(file_urls))
+    return file_urls
 
 
-secFile(cik)
+def getThoseNaughtyBits(cik):
+    cikUrl = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK='+str(cik)+'&type=&dateb=&owner=exclude&start=0&count=100'
+    page = urllib2.urlopen(cikUrl)
+    soup = BeautifulSoup(page, 'html.parser')
+    buttons = soup.find_all('a', {'id': 'documentsbutton'})
 
-#def getThoseNaughtyBits(penis)
-
+    rows = table.find_all('tr')
+    for row in rows:
+        cols = row.find_all('td')
+        cols = [ele.text.strip() for ele in cols]
+        d = [ele for ele in cols if ele]
+        if d:
+            datum[d[0]] = d[1:]
+    return datum
+print(getThoseNaughtyBits(cik))
